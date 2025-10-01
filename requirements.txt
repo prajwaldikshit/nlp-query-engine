@@ -1,0 +1,17 @@
+#Backend Framework
+fastapi
+uvicorn[standard]
+python-multipart
+
+#Database Interaction
+SQLAlchemy
+psycopg2-binary
+
+#AI and Environment Variables
+google-generativeai==0.5.2
+python-dotenv
+
+#Document Processing & Embeddings
+sentence-transformers
+pypdf2
+python-docx
