@@ -1,4 +1,5 @@
 AI-Powered NLP Query Engine
+
 This project is a full-stack web application that serves as an intelligent, natural language query engine for an employee database. It can connect to any SQL database, automatically discover its schema, and answer questions posed in plain English by generating and executing SQL queries. It can also ingest and prepare unstructured documents (like PDFs and DOCX files) for future searching.
 This project was built as a submission for the AI Engineering internship assignment.
 
@@ -31,17 +32,17 @@ Project Structure:
 
 nlp-query-engine/
 +-- backend/
-¦   +-- api/
-¦   ¦   +-- routes/
-¦   ¦       +-- ingestion.py
-¦   ¦       +-- query.py
-¦   +-- services/
-¦       +-- document_processor.py
-¦       +-- query_cache.py
-¦       +-- query_engine.py
-¦       +-- schema_discovery.py
+Â¦   +-- api/
+Â¦   Â¦   +-- routes/
+Â¦   Â¦       +-- ingestion.py
+Â¦   Â¦       +-- query.py
+Â¦   +-- services/
+Â¦       +-- document_processor.py
+Â¦       +-- query_cache.py
+Â¦       +-- query_engine.py
+Â¦       +-- schema_discovery.py
 +-- frontend/
-¦   +-- index.html
+Â¦   +-- index.html
 +-- .env
 +-- create_test_db.py
 +-- populate_db.py
