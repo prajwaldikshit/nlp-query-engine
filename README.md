@@ -60,10 +60,12 @@ Prerequisites:
 - A Git client
 
 1. Clone the Repository
+   
 git clone [https://github.com/your-username/nlp-query-engine.git](https://github.com/your-username/nlp-query-engine.git)
 cd nlp-query-engine
----
+
 2. Set Up The Backend
+   
 a. Create and Activate Virtual Environment:
 # Create the virtual environment
 python -m venv venv
@@ -73,16 +75,16 @@ source venv/bin/activate
 
 # Activate on Windows (Git Bash)
 source venv/Scripts/activate
----
+
 b. Install Dependencies:
 pip install -r requirements.txt
----
+
 c. Set Up Environment Variables:
 Create a .env file in the root directory of the project and add your Google Gemini API key.
 
 GOOGLE_API_KEY="YOUR_GEMINI_API_KEY_HERE"
 
----
+
 d. Create and Populate the Database:
 
 Run the following scripts in order to create the database schema and fill it with sample data.
@@ -96,12 +98,13 @@ python populate_db.py
 ---
 
 3. Run the Application
+   
 a. Start the Backend Server:
 
 With your virtual environment active, run the following command from the root project directory:
 python -m uvicorn backend.main:app --reload
 The server will be running at http://127.0.0.1:8000.
----
+
 b. Launch the Frontend:
 
 Navigate to the frontend/ directory and open the index.html file in your web browser.
