@@ -1,8 +1,9 @@
-AI-Powered NLP Query Engine
+# AI-Powered NLP Query Engine
+
 This project is a full-stack web application that serves as an intelligent, natural language query engine for an employee database. It can connect to any SQL database, automatically discover its schema, and answer questions posed in plain English by generating and executing SQL queries. It can also ingest and prepare unstructured documents (like PDFs and DOCX files) for future searching.
 This project was built as a submission for the AI Engineering internship assignment.
-
-Core Features:
+---
+## Core Features:
 
 Dynamic Schema Discovery: Automatically discovers the schema (tables, columns, relationships) of any connected SQL database without hard-coding.
 
@@ -14,7 +15,8 @@ Document Processing: An endpoint is available to upload and process unstructured
 
 Full-Stack Interface: A clean, modern web interface built with HTML, Tailwind CSS, and vanilla JavaScript allows users to interact with all backend features seamlessly.
 
-Tech Stack:
+---
+## Tech Stack:
 
 Backend: Python 3, FastAPI, SQLAlchemy, Uvicorn
 
@@ -26,41 +28,44 @@ Document Processing: PyPDF2, python-docx
 
 Frontend: HTML, Tailwind CSS, Vanilla JavaScript
 
-
-Project Structure:
+---
+## Project Structure:
 
 nlp-query-engine/
 +-- backend/
-¦   +-- api/
-¦   ¦   +-- routes/
-¦   ¦       +-- ingestion.py
-¦   ¦       +-- query.py
-¦   +-- services/
-¦       +-- document_processor.py
-¦       +-- query_cache.py
-¦       +-- query_engine.py
-¦       +-- schema_discovery.py
+Â¦   +-- api/
+Â¦   Â¦   +-- routes/
+Â¦   Â¦       +-- ingestion.py
+Â¦   Â¦       +-- query.py
+Â¦   +-- services/
+Â¦       +-- document_processor.py
+Â¦       +-- query_cache.py
+Â¦       +-- query_engine.py
+Â¦       +-- schema_discovery.py
 +-- frontend/
-¦   +-- index.html
+Â¦   +-- index.html
 +-- .env
 +-- create_test_db.py
 +-- populate_db.py
 +-- README.md
 +-- requirements.txt
 
+---
 
-Setup and Installation
+## Setup and Installation
 Follow these steps to set up and run the project locally.
 
-Prerequisites:
+### Prerequisites:
 - Python 3.8+
 - A Git client
 
 1. Clone the Repository
+   
 git clone [https://github.com/your-username/nlp-query-engine.git](https://github.com/your-username/nlp-query-engine.git)
 cd nlp-query-engine
 
 2. Set Up The Backend
+   
 a. Create and Activate Virtual Environment:
 # Create the virtual environment
 python -m venv venv
@@ -90,8 +95,10 @@ python create_test_db.py
 # Second, populate the tables with data
 python populate_db.py
 
+---
 
 3. Run the Application
+   
 a. Start the Backend Server:
 
 With your virtual environment active, run the following command from the root project directory:
@@ -103,3 +110,9 @@ b. Launch the Frontend:
 Navigate to the frontend/ directory and open the index.html file in your web browser.
 
 You can now interact with the application!
+
+---
+## Screenshots:
+<img width="1919" height="867" alt="image" src="https://github.com/user-attachments/assets/4cd9a1ee-e2c6-4efa-92ce-915f7d3d40f8" />
+<img width="1919" height="870" alt="image" src="https://github.com/user-attachments/assets/e61aaea2-9d99-4315-9f21-b3636cd72416" />
+
