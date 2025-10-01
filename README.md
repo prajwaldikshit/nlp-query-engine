@@ -104,3 +104,9 @@ b. Launch the Frontend:
 Navigate to the frontend/ directory and open the index.html file in your web browser.
 
 You can now interact with the application!
+
+---
+# Screenshots:
+<img width="1919" height="867" alt="image" src="https://github.com/user-attachments/assets/4cd9a1ee-e2c6-4efa-92ce-915f7d3d40f8" />
+<img width="1919" height="870" alt="image" src="https://github.com/user-attachments/assets/e61aaea2-9d99-4315-9f21-b3636cd72416" />
+
