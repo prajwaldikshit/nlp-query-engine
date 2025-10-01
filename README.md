@@ -1,9 +1,9 @@
-AI-Powered NLP Query Engine
+# AI-Powered NLP Query Engine
 
 This project is a full-stack web application that serves as an intelligent, natural language query engine for an employee database. It can connect to any SQL database, automatically discover its schema, and answer questions posed in plain English by generating and executing SQL queries. It can also ingest and prepare unstructured documents (like PDFs and DOCX files) for future searching.
 This project was built as a submission for the AI Engineering internship assignment.
 ---
-Core Features:
+##Core Features:
 
 Dynamic Schema Discovery: Automatically discovers the schema (tables, columns, relationships) of any connected SQL database without hard-coding.
 
@@ -16,7 +16,7 @@ Document Processing: An endpoint is available to upload and process unstructured
 Full-Stack Interface: A clean, modern web interface built with HTML, Tailwind CSS, and vanilla JavaScript allows users to interact with all backend features seamlessly.
 
 ---
-Tech Stack:
+##Tech Stack:
 
 Backend: Python 3, FastAPI, SQLAlchemy, Uvicorn
 
@@ -29,7 +29,7 @@ Document Processing: PyPDF2, python-docx
 Frontend: HTML, Tailwind CSS, Vanilla JavaScript
 
 ---
-Project Structure:
+##Project Structure:
 
 nlp-query-engine/
 +-- backend/
@@ -52,10 +52,10 @@ nlp-query-engine/
 
 ---
 
-Setup and Installation
+##Setup and Installation
 Follow these steps to set up and run the project locally.
 
-Prerequisites:
+###Prerequisites:
 - Python 3.8+
 - A Git client
 
@@ -112,7 +112,7 @@ Navigate to the frontend/ directory and open the index.html file in your web bro
 You can now interact with the application!
 
 ---
-# Screenshots:
+## Screenshots:
 <img width="1919" height="867" alt="image" src="https://github.com/user-attachments/assets/4cd9a1ee-e2c6-4efa-92ce-915f7d3d40f8" />
 <img width="1919" height="870" alt="image" src="https://github.com/user-attachments/assets/e61aaea2-9d99-4315-9f21-b3636cd72416" />
 
