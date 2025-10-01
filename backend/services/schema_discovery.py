@@ -1,6 +1,5 @@
-import asyncio
+import sqlalchemy as db
 from typing import Any, Dict, List
-from sqlalchemy import create_engine, inspect, text, exc
 
 class SchemaDiscovery:
     """
@@ -8,70 +7,53 @@ class SchemaDiscovery:
     columns, and relationships.
     """
     def __init__(self, connection_string: str):
+        """
+        Initializes the discovery service with the database connection string.
+        """
         if not connection_string:
             raise ValueError("Connection string cannot be empty.")
         self.connection_string = connection_string
-        try:
-            self.engine = create_engine(self.connection_string)
-        except Exception as e:
-            raise ConnectionError(f"Failed to create database engine: {e}")
+        self.engine = db.create_engine(self.connection_string)
+        self.metadata = db.MetaData()
 
-    async def discover(self) -> Dict[str, Any]:
+    def discover(self) -> Dict[str, Any]:
         """
-        Asynchronously discovers the database schema.
-        This is the public method to be called.
+        Performs the schema discovery.
+        This is a synchronous method.
         """
-        loop = asyncio.get_event_loop()
         try:
-            # Use run_in_executor for the blocking database calls
-            schema = await loop.run_in_executor(None, self._discover_schema_sync)
-            return schema
-        except exc.SQLAlchemyError as e:
-            raise ConnectionError(f"Database connection error: {e}")
-        except Exception as e:
-            raise RuntimeError(f"An unexpected error occurred during schema discovery: {e}")
-
-    def _discover_schema_sync(self) -> Dict[str, Any]:
-        """
-        Synchronous method that performs the actual schema discovery.
-        Should be run in a separate thread to avoid blocking the event loop.
-        """
-        with self.engine.connect() as connection:
-            inspector = inspect(self.engine)
-            tables_info = []
-            schema_names = inspector.get_schema_names()
+            # The reflect method inspects the database and populates the metadata object
+            self.metadata.reflect(bind=self.engine)
             
-            for schema_name in schema_names:
-                # We often want to ignore system schemas
-                if schema_name not in ['information_schema', 'pg_catalog', 'sys']:
-                    table_names = inspector.get_table_names(schema=schema_name)
-                    for table_name in table_names:
-                        columns = inspector.get_columns(table_name, schema=schema_name)
-                        foreign_keys = inspector.get_foreign_keys(table_name, schema=schema_name)
-                        
-                        columns_info = [
-                            {
-                                "name": col["name"],
-                                "type": str(col["type"]),
-                                "primary_key": col.get("primary_key", False),
-                                "nullable": col.get("nullable", True),
-                            }
-                            for col in columns
-                        ]
+            schema_info = {"tables": []}
+            
+            for table_name, table in self.metadata.tables.items():
+                table_info = {
+                    "name": table_name,
+                    "columns": [],
+                    "relationships": []
+                }
+                
+                # Get columns and their types
+                for column in table.columns:
+                    table_info["columns"].append({
+                        "name": column.name,
+                        "type": str(column.type),
+                        "primary_key": column.primary_key,
+                        "nullable": column.nullable,
+                    })
 
-                        relationships_info = [
-                            {
-                                "constrained_columns": fk["constrained_columns"],
-                                "referred_table": fk["referred_table"],
-                                "referred_columns": fk["referred_columns"],
-                            }
-                            for fk in foreign_keys
-                        ]
-                        
-                        tables_info.append({
-                            "name": table_name,
-                            "columns": columns_info,
-                            "relationships": relationships_info,
-                        })
-
-            return {"tables": tables_info}
+                # Get foreign key relationships
+                for fk in table.foreign_keys:
+                    table_info["relationships"].append({
+                        "constrained_columns": [c.name for c in fk.constraint.columns],
+                        "referred_table": fk.column.table.name,
+                        "referred_columns": [fk.column.name]
+                    })
+                
+                schema_info["tables"].append(table_info)
+                
+            return schema_info
+        except Exception as e:
+            # In case of an error (e.g., bad connection string), re-raise it
+            raise Exception(f"Failed to discover schema: {e}")

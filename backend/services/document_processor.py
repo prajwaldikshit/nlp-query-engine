@@ -1,75 +1,89 @@
-from typing import List, IO, Dict, Any
-import PyPDF2
-from docx import Document
-from sentence_transformers import SentenceTransformer
 import io
+from typing import List, Dict, Any
+import docx
+import PyPDF2
+from sentence_transformers import SentenceTransformer, util
 
-# In-memory storage for our document chunks and their embeddings.
-# In a production system, this would be a proper vector database like Pinecone or ChromaDB.
-document_store: List[Dict[str, Any]] = []
+# Use a smaller, faster model for this project.
+# This model will be downloaded automatically the first time it's used.
+model = SentenceTransformer('all-MiniLM-L6-v2')
 
 class DocumentProcessor:
     """
-    Handles text extraction, chunking, and embedding generation for documents.
+    A singleton class to handle document processing, chunking, embedding generation,
+    and in-memory storage.
     """
-    def __init__(self):
-        # Using a small, efficient model for generating embeddings.
-        # This model will be downloaded the first time it's used.
-        self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+    _instance = None
 
-    def _extract_text_from_pdf(self, file_content: bytes) -> str:
-        """Extracts text from a PDF file's content."""
-        reader = PyPDF2.PdfReader(io.BytesIO(file_content))
-        text = ""
-        for page in reader.pages:
-            text += page.extract_text() or ""
-        return text
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(DocumentProcessor, cls).__new__(cls)
+            cls._instance.chunks = []
+            cls._instance.embeddings = None
+            print("DocumentProcessor initialized.")
+        return cls._instance
 
-    def _extract_text_from_docx(self, file_content: bytes) -> str:
-        """Extracts text from a DOCX file's content."""
-        doc = Document(io.BytesIO(file_content))
-        text = "\n".join([para.text for para in doc.paragraphs])
-        return text
-
-    def _chunk_text(self, text: str, chunk_size: int = 512, overlap: int = 50) -> List[str]:
-        """Splits a long text into smaller, overlapping chunks based on words."""
-        tokens = text.split()
-        if not tokens:
-            return []
-        chunks = []
-        for i in range(0, len(tokens), chunk_size - overlap):
-            chunks.append(" ".join(tokens[i:i + chunk_size]))
-        return chunks
-
-    def process_documents(self, file_contents: List[bytes], filenames: List[str]) -> None:
+    def process_documents(self, files: List[Any]) -> int:
         """
-        Processes a list of uploaded files, generating and storing embeddings.
+        Processes a list of uploaded files, extracts text, chunks, and creates embeddings.
         """
-        global document_store
-        document_store.clear() # For this demo, we clear the store on each new upload.
-
-        all_chunks = []
-        for i, content in enumerate(file_contents):
-            filename = filenames[i]
-            text = ""
-            if filename.lower().endswith(".pdf"):
-                text = self._extract_text_from_pdf(content)
-            elif filename.lower().endswith(".docx"):
-                text = self._extract_text_from_docx(content)
+        self.chunks = []
+        all_texts = []
+        for file in files:
+            content = file.file.read()
+            if file.filename.endswith(".pdf"):
+                text = self._read_pdf(content)
+            elif file.filename.endswith(".docx"):
+                text = self._read_docx(content)
+            else:
+                continue
             
             if text:
-                chunks = self._chunk_text(text)
-                for chunk in chunks:
-                    all_chunks.append({"text": chunk, "filename": filename})
+                # Simple chunking by paragraph
+                all_texts.extend(text.split('\n\n'))
+
+        self.chunks = [chunk for chunk in all_texts if chunk.strip()]
+        if self.chunks:
+            self.embeddings = model.encode(self.chunks, convert_to_tensor=True)
         
-        if all_chunks:
-            # Generate embeddings for all chunks in one batch for efficiency.
-            chunk_texts = [item['text'] for item in all_chunks]
-            embeddings = self.embedding_model.encode(chunk_texts)
+        return len(self.chunks)
+
+    def search_documents(self, query: str, top_k: int = 3) -> List[Dict[str, Any]]:
+        """
+        Searches the indexed documents for a given query.
+        """
+        if not self.chunks or self.embeddings is None:
+            return []
+
+        query_embedding = model.encode(query, convert_to_tensor=True)
+        
+        # Use semantic search to find the most relevant chunks
+        hits = util.semantic_search(query_embedding, self.embeddings, top_k=top_k)
+        
+        # 'hits' is a list of lists, we take the first list for the first query
+        hits = hits[0]
+        
+        search_results = []
+        for hit in hits:
+            # THE FIX: Convert the numpy float score to a standard Python float
+            # before adding it to the results.
+            search_results.append({
+                'chunk': self.chunks[hit['corpus_id']],
+                'score': float(hit['score']) 
+            })
             
-            for i, item in enumerate(all_chunks):
-                document_store.append({
-                    "filename": item['filename'],
-                    "chunk_text": item['text'],
-                    "embedding": embeddings[i].tolist() # Convert numpy array to list for JSON
-                })
+        return search_results
+
+    def _read_pdf(self, content: bytes) -> str:
+        try:
+            reader = PyPDF2.PdfReader(io.BytesIO(content))
+            return "".join(page.extract_text() for page in reader.pages)
+        except Exception:
+            return ""
+
+    def _read_docx(self, content: bytes) -> str:
+        try:
+            doc = docx.Document(io.BytesIO(content))
+            return "\n\n".join(para.text for para in doc.paragraphs)
+        except Exception:
+            return ""

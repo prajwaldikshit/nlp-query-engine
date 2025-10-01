@@ -6,373 +6,358 @@
     <title>AI-Powered NLP Query Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styles for a professional look and feel */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
         }
         .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            border-top-color: #3498db;
+            -webkit-animation: spin 1s linear infinite;
             animation: spin 1s linear infinite;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .drop-zone-active {
-            border-color: #3498db;
-        }
-        /* Simple tree view for schema */
-        .tree ul {
-            padding-left: 1.5rem;
-            border-left: 1px solid #4a5568;
-        }
-        .tree li {
-            position: relative;
-            padding-left: 1rem;
-        }
-        .tree li::before {
-            content: '';
-            position: absolute;
-            top: 0.75rem;
-            left: -1.5rem;
-            width: 1.25rem;
-            height: 1px;
-            background-color: #4a5568;
-        }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
+<body class="bg-slate-900 text-slate-300">
 
     <div class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-10">
-            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">AI-Powered NLP Query Engine</h1>
-            <p class="mt-2 text-lg text-slate-600 dark:text-slate-400">Query your database and documents using natural language.</p>
+            <h1 class="text-4xl md:text-5xl font-bold text-white">AI-Powered NLP Query Engine</h1>
+            <p class="text-slate-400 mt-2">Query your database and documents using natural language.</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
             <!-- Left Panel: Data Ingestion -->
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4 border-b border-slate-300 dark:border-slate-700 pb-3">1. Connect Data</h2>
-                
-                <!-- Database Connection -->
+            <div class="bg-slate-800 p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-white mb-4 border-b border-slate-700 pb-2">1. Connect Data</h2>
+
+                <!-- Database Section -->
                 <div class="mb-6">
-                    <h3 class="text-xl font-medium mb-3">Database</h3>
-                    <form id="db-form">
-                        <label for="db-connection-string" class="block mb-2 text-sm font-medium">Connection String</label>
-                        <input type="text" id="db-connection-string" class="w-full bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="postgresql://user:pass@host/db" value="sqlite:///./test.db">
-                        <button type="submit" id="connect-btn" class="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-transform transform hover:scale-105">
-                            Connect & Analyze
-                        </button>
-                    </form>
-                    <div id="db-status" class="mt-3 text-sm"></div>
+                    <h3 class="text-lg font-medium text-white mb-2">Database</h3>
+                    <label for="connection_string" class="block text-sm font-medium text-slate-400 mb-1">Connection String</label>
+                    <input type="text" id="connection_string" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="sqlite:///./test.db">
+                    <button id="connect_db_btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-3 transition duration-200">
+                        Connect & Analyze
+                    </button>
+                    <div id="db_status" class="mt-2 text-sm"></div>
                 </div>
-                
-                <!-- Schema Visualization -->
+
+                <!-- Schema Display -->
                 <div class="mb-6">
-                    <h3 class="text-xl font-medium mb-3">Discovered Schema</h3>
-                    <div id="schema-display" class="bg-slate-100 dark:bg-slate-900 p-4 rounded-lg h-48 overflow-y-auto text-sm tree">
-                        <p class="text-slate-500 dark:text-slate-400">Connect to a database to see its schema here.</p>
+                    <h3 class="text-lg font-medium text-white mb-2">Discovered Schema</h3>
+                    <div id="schema_display" class="bg-slate-900/50 p-3 rounded-md h-40 overflow-y-auto text-sm text-slate-400 border border-slate-700">
+                        Please connect to a database first.
                     </div>
                 </div>
 
-                <!-- Document Upload -->
+                <!-- Document Upload Section -->
                 <div>
-                    <h3 class="text-xl font-medium mb-3">Documents</h3>
-                    <form id="doc-form">
-                        <div id="drop-zone" class="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-8 text-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                            <p>Drag & drop files here, or click to select</p>
-                            <input type="file" id="file-input" class="hidden" multiple>
-                        </div>
-                        <button type="submit" id="upload-btn" class="mt-3 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-transform transform hover:scale-105" disabled>
-                            Upload Files
-                        </button>
-                    </form>
-                    <div id="doc-status" class="mt-3 text-sm"></div>
+                    <h3 class="text-lg font-medium text-white mb-2">Documents</h3>
+                    <div id="drop_zone" class="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center cursor-pointer hover:border-blue-500 transition">
+                        <p>Drag & drop files here, or click to select</p>
+                        <input type="file" id="file_input" multiple class="hidden">
+                    </div>
+                    <button id="upload_files_btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md mt-3 transition duration-200">
+                        Upload Files
+                    </button>
+                    <div id="upload_status" class="mt-2 text-sm"></div>
                 </div>
             </div>
 
             <!-- Right Panel: Query Interface -->
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4 border-b border-slate-300 dark:border-slate-700 pb-3">2. Query Data</h2>
-                
-                <form id="query-form">
-                    <label for="query-input" class="block mb-2 text-sm font-medium">Enter your natural language query</label>
-                    <textarea id="query-input" rows="4" class="w-full bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g., 'Show me the top 5 highest paid employees'"></textarea>
-                    <button type="submit" id="query-btn" class="mt-3 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-transform transform hover:scale-105">
+            <div class="bg-slate-800 p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-white mb-4 border-b border-slate-700 pb-2">2. Query Data</h2>
+
+                <div>
+                    <label for="query_input" class="block text-sm font-medium text-slate-400 mb-1">Enter your natural language query</label>
+                    <textarea id="query_input" rows="4" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 'Show me the top 5 highest paid employees'"></textarea>
+                    <button id="run_query_btn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md mt-3 transition duration-200">
                         Run Query
                     </button>
-                </form>
+                </div>
 
-                <!-- Results and Metrics -->
                 <div class="mt-6">
-                    <h3 class="text-xl font-medium mb-3">Results</h3>
-                    <div id="metrics-display" class="flex justify-between items-center bg-slate-100 dark:bg-slate-900 p-3 rounded-t-lg text-sm">
-                        <!-- Metrics will be dynamically inserted here -->
-                    </div>
-                    <div id="results-view" class="bg-slate-100 dark:bg-slate-900 p-4 rounded-b-lg h-96 overflow-auto">
-                         <p class="text-slate-500 dark:text-slate-400">Query results will appear here.</p>
-                    </div>
+                     <h3 class="text-lg font-medium text-white mb-2">Results</h3>
+                     <div id="results_container" class="bg-slate-900/50 p-3 rounded-md min-h-[200px] border border-slate-700 overflow-x-auto">
+                        Query results will appear here.
+                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script>
-        // State variables to hold discovered schema and files
-        let dbSchema = null;
-        let filesToUpload = [];
+        const connectDbBtn = document.getElementById('connect_db_btn');
+        const dbStatus = document.getElementById('db_status');
+        const schemaDisplay = document.getElementById('schema_display');
+        const runQueryBtn = document.getElementById('run_query_btn');
+        const queryInput = document.getElementById('query_input');
+        const resultsContainer = document.getElementById('results_container');
 
-        // DOM Element References
-        const dbForm = document.getElementById('db-form');
-        const connectBtn = document.getElementById('connect-btn');
-        const dbConnectionStringInput = document.getElementById('db-connection-string');
-        const dbStatus = document.getElementById('db-status');
-        const schemaDisplay = document.getElementById('schema-display');
+        const dropZone = document.getElementById('drop_zone');
+        const fileInput = document.getElementById('file_input');
+        const uploadFilesBtn = document.getElementById('upload_files_btn');
+        const uploadStatus = document.getElementById('upload_status');
 
-        const docForm = document.getElementById('doc-form');
-        const dropZone = document.getElementById('drop-zone');
-        const fileInput = document.getElementById('file-input');
-        const uploadBtn = document.getElementById('upload-btn');
-        const docStatus = document.getElementById('doc-status');
+        let discoveredSchema = null;
+        let selectedFiles = [];
 
-        const queryForm = document.getElementById('query-form');
-        const queryBtn = document.getElementById('query-btn');
-        const queryInput = document.getElementById('query-input');
-        const metricsDisplay = document.getElementById('metrics-display');
-        const resultsView = document.getElementById('results-view');
-        
-        const API_BASE_URL = 'http://127.0.0.1:8000/api';
-
-        // --- Helper Functions ---
-        function showLoading(element, button, originalText) {
-            element.innerHTML = `<div class="flex items-center text-blue-500"><div class="loader mr-2"></div><span>Processing...</span></div>`;
-            if (button) {
-                button.disabled = true;
-                button.innerHTML = '<div class="loader mx-auto"></div>';
-            }
-        }
-
-        function showSuccess(element, message, button, originalText) {
-            element.innerHTML = `<span class="text-green-500 font-medium">${message}</span>`;
-            if (button) {
-                button.disabled = false;
-                button.innerHTML = originalText;
-            }
-        }
-
-        function showError(element, message, button, originalText) {
-            element.innerHTML = `<span class="text-red-500 font-medium">${message}</span>`;
-            if (button) {
-                button.disabled = false;
-                button.innerHTML = originalText;
-            }
-        }
-
-        function renderSchema(schema) {
-            if (!schema || !schema.tables || schema.tables.length === 0) {
-                schemaDisplay.innerHTML = '<p class="text-slate-500 dark:text-slate-400">No tables found or schema is empty.</p>';
-                return;
-            }
-            let html = '<ul>';
-            schema.tables.forEach(table => {
-                html += `<li><strong class="text-sky-400">${table.name}</strong>`;
-                if (table.columns && table.columns.length > 0) {
-                    html += '<ul>';
-                    table.columns.forEach(col => {
-                        html += `<li>${col.name} <span class="text-slate-500 dark:text-slate-400">(${col.type})</span></li>`;
-                    });
-                    html += '</ul>';
-                }
-                html += '</li>';
-            });
-            html += '</ul>';
-            schemaDisplay.innerHTML = html;
-        }
-        
-        function renderTable(data) {
-            if (!data || data.length === 0) {
-                resultsView.innerHTML = '<p class="text-slate-500 dark:text-slate-400">The query returned no results.</p>';
-                return;
-            }
-            const headers = Object.keys(data[0]);
-            let tableHtml = '<table class="w-full text-sm text-left text-slate-500 dark:text-slate-400"> <thead class="text-xs text-slate-700 uppercase bg-slate-200 dark:bg-slate-700 dark:text-slate-400"><tr>';
-            headers.forEach(header => {
-                tableHtml += `<th scope="col" class="px-6 py-3">${header}</th>`;
-            });
-            tableHtml += '</tr></thead><tbody>';
-
-            data.forEach(row => {
-                tableHtml += '<tr class="bg-white border-b dark:bg-slate-800 dark:border-slate-700">';
-                headers.forEach(header => {
-                    tableHtml += `<td class="px-6 py-4">${row[header]}</td>`;
-                });
-                tableHtml += '</tr>';
-            });
-            tableHtml += '</tbody></table>';
-            resultsView.innerHTML = tableHtml;
-        }
-
-        // --- Event Listeners ---
-
-        // 1. Database Connection
-        dbForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const originalBtnText = 'Connect & Analyze';
-            showLoading(dbStatus, connectBtn, originalBtnText);
-            const connectionString = dbConnectionStringInput.value;
-
+        // --- Database Connection Logic ---
+        connectDbBtn.addEventListener('click', async () => {
+            const connectionString = document.getElementById('connection_string').value;
             if (!connectionString) {
-                showError(dbStatus, 'Connection string cannot be empty.', connectBtn, originalBtnText);
+                dbStatus.textContent = 'Error: Connection string cannot be empty.';
+                dbStatus.className = 'mt-2 text-sm text-red-400';
                 return;
             }
+
+            setLoading(connectDbBtn, 'Connecting...');
+            dbStatus.textContent = 'Analyzing database...';
+            dbStatus.className = 'mt-2 text-sm text-yellow-400';
 
             try {
-                const response = await fetch(`${API_BASE_URL}/connect-database`, {
+                const response = await fetch('http://127.0.0.1:8000/api/connect-database', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ connection_string: connectionString })
                 });
 
-                const result = await response.json();
+                const data = await response.json();
+
                 if (!response.ok) {
-                    throw new Error(result.detail || 'Failed to connect.');
+                    throw new Error(data.detail || 'Failed to connect to the database.');
                 }
-                
-                dbSchema = result.schema; // Store schema
-                showSuccess(dbStatus, result.message, connectBtn, originalBtnText);
-                renderSchema(dbSchema);
+
+                dbStatus.textContent = 'Database schema discovered successfully!';
+                dbStatus.className = 'mt-2 text-sm text-green-400';
+                discoveredSchema = data.schema;
+                displaySchema(discoveredSchema);
 
             } catch (error) {
-                dbSchema = null;
-                showError(dbStatus, `Error: ${error.message}`, connectBtn, originalBtnText);
-                schemaDisplay.innerHTML = '<p class="text-red-500 dark:text-red-400">Failed to load schema.</p>';
+                dbStatus.textContent = `Error: ${error.message}`;
+                dbStatus.className = 'mt-2 text-sm text-red-400';
+                schemaDisplay.innerHTML = '<p class="text-red-400">Failed to load schema.</p>';
+                discoveredSchema = null;
+            } finally {
+                resetLoading(connectDbBtn, 'Connect & Analyze');
             }
         });
 
-        // 2. Document Upload
+        function displaySchema(schema) {
+            if (!schema || !schema.tables) {
+                schemaDisplay.innerHTML = '<p class="text-yellow-400">No tables found or schema is invalid.</p>';
+                return;
+            }
+            let html = '<ul>';
+            schema.tables.forEach(table => {
+                html += `<li class="mb-2"><strong class="text-blue-400">${table.name}</strong><ul>`;
+                table.columns.forEach(col => {
+                    html += `<li>- ${col.name} (${col.type})</li>`;
+                });
+                html += '</ul></li>';
+            });
+            html += '</ul>';
+            schemaDisplay.innerHTML = html;
+        }
+
+        // --- Document Upload Logic ---
+        dropZone.addEventListener('click', () => fileInput.click());
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
-            dropZone.classList.add('drop-zone-active');
+            dropZone.classList.add('border-blue-500', 'bg-slate-700');
         });
         dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('drop-zone-active');
+            dropZone.classList.remove('border-blue-500', 'bg-slate-700');
         });
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropZone.classList.remove('drop-zone-active');
-            filesToUpload = [...e.dataTransfer.files];
-            updateDropZoneText();
-            uploadBtn.disabled = filesToUpload.length === 0;
+            dropZone.classList.remove('border-blue-500', 'bg-slate-700');
+            const files = e.dataTransfer.files;
+            handleFiles(files);
         });
-        dropZone.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', () => {
-            filesToUpload = [...fileInput.files];
-            updateDropZoneText();
-            uploadBtn.disabled = filesToUpload.length === 0;
+            handleFiles(fileInput.files);
         });
 
-        function updateDropZoneText() {
-            if (filesToUpload.length > 0) {
-                dropZone.querySelector('p').textContent = `${filesToUpload.length} file(s) selected.`;
-            } else {
-                dropZone.querySelector('p').textContent = 'Drag & drop files here, or click to select';
-            }
+        function handleFiles(files) {
+            selectedFiles = [...files];
+            uploadStatus.textContent = `${selectedFiles.length} file(s) selected.`;
+            uploadStatus.className = 'mt-2 text-sm text-slate-400';
         }
 
-        docForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (filesToUpload.length === 0) {
-                showError(docStatus, 'Please select files to upload.', null, null);
+        uploadFilesBtn.addEventListener('click', async () => {
+            if (selectedFiles.length === 0) {
+                uploadStatus.textContent = 'Error: No files selected.';
+                uploadStatus.className = 'mt-2 text-sm text-red-400';
                 return;
             }
 
-            const originalBtnText = 'Upload Files';
-            showLoading(docStatus, uploadBtn, originalBtnText);
-
             const formData = new FormData();
-            filesToUpload.forEach(file => {
+            selectedFiles.forEach(file => {
                 formData.append('files', file);
             });
 
+            setLoading(uploadFilesBtn, 'Uploading...');
+            uploadStatus.textContent = 'Processing documents...';
+            uploadStatus.className = 'mt-2 text-sm text-yellow-400';
+
             try {
-                const response = await fetch(`${API_BASE_URL}/upload-documents`, {
+                const response = await fetch('http://127.0.0.1:8000/api/upload-documents', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
                 });
-                const result = await response.json();
+
+                const data = await response.json();
+
                 if (!response.ok) {
-                    throw new Error(result.detail || 'Upload failed.');
+                    throw new Error(data.detail || 'Failed to upload documents.');
                 }
-                showSuccess(docStatus, result.message, uploadBtn, originalBtnText);
-                filesToUpload = [];
-                updateDropZoneText();
-            } catch(error) {
-                showError(docStatus, `Error: ${error.message}`, uploadBtn, originalBtnText);
+
+                uploadStatus.textContent = data.message;
+                uploadStatus.className = 'mt-2 text-sm text-green-400';
+
+            } catch (error) {
+                uploadStatus.textContent = `Error: ${error.message}`;
+                uploadStatus.className = 'mt-2 text-sm text-red-400';
+            } finally {
+                resetLoading(uploadFilesBtn, 'Upload Files');
+                selectedFiles = [];
             }
         });
 
-        // 3. Query Execution
-        queryForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const start = performance.now();
-            const originalBtnText = 'Run Query';
-            showLoading(resultsView, queryBtn, originalBtnText);
-            metricsDisplay.innerHTML = '';
-            
-            const userQuery = queryInput.value;
-            const connectionString = dbConnectionStringInput.value;
+        // --- Query Execution Logic ---
+        runQueryBtn.addEventListener('click', async () => {
+            const query = queryInput.value;
+            const connectionString = document.getElementById('connection_string').value;
 
-            if (!userQuery) {
-                showError(resultsView, 'Query cannot be empty.', queryBtn, originalBtnText);
+            if (!query) {
+                resultsContainer.innerHTML = '<p class="text-red-400">Error: Query cannot be empty.</p>';
                 return;
             }
-            if (!dbSchema) {
-                showError(resultsView, 'Please connect to a database first.', queryBtn, originalBtnText);
+            if (!discoveredSchema) {
+                resultsContainer.innerHTML = '<p class="text-red-400">Error: Please connect to a database first.</p>';
                 return;
             }
+
+            setLoading(runQueryBtn, 'Running...');
+            resultsContainer.innerHTML = '<div class="flex justify-center items-center h-full"><div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div></div>';
+
+            const startTime = performance.now();
 
             try {
-                const response = await fetch(`${API_BASE_URL}/query`, {
+                const response = await fetch('http://127.0.0.1:8000/api/query', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        user_query: userQuery,
-                        db_schema: dbSchema,
-                        connection_string: connectionString
+                        user_query: query,
+                        db_schema: discoveredSchema,
+                        connection_string: connectionString,
                     })
                 });
 
-                const result = await response.json();
+                const endTime = performance.now();
+                const responseTime = ((endTime - startTime) / 1000).toFixed(2);
+
                 if (!response.ok) {
-                    throw new Error(result.detail || 'Failed to process query.');
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Failed to fetch results.');
                 }
-                
-                const end = performance.now();
-                const duration = ((end - start) / 1000).toFixed(2);
-                
-                // Display metrics
-                let cacheStatus = result.message.includes('cache') ? 
-                    '<span class="text-green-400 font-semibold px-2 py-1 bg-green-900/50 rounded-md">CACHE HIT</span>' :
-                    '<span class="text-orange-400 font-semibold px-2 py-1 bg-orange-900/50 rounded-md">CACHE MISS</span>';
-                metricsDisplay.innerHTML = `
-                    <span>Response Time: <strong>${duration}s</strong></span>
-                    ${cacheStatus}
-                `;
-                
-                renderTable(result.data);
-                showSuccess({}, '', queryBtn, originalBtnText);
 
+                const data = await response.json();
+                displayResults(data, responseTime, data.message === 'Result from cache');
 
-            } catch(error) {
-                showError(resultsView, `Error: ${error.message}`, queryBtn, originalBtnText);
-                metricsDisplay.innerHTML = '';
+            } catch (error) {
+                resultsContainer.innerHTML = `<p class="text-red-400">Error: ${error.message}</p>`;
+            } finally {
+                resetLoading(runQueryBtn, 'Run Query');
             }
         });
+
+        function displayResults(result, responseTime, isCached) {
+            let html = `<div class="flex justify-between items-center mb-2">
+                            <p class="text-sm">Response Time: ${responseTime}s</p>
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full ${isCached ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'}">${isCached ? 'CACHE HIT' : 'CACHE MISS'}</span>
+                        </div>`;
+
+            if (!result.data || result.data.length === 0) {
+                html += '<p>The query returned no results.</p>';
+                resultsContainer.innerHTML = html;
+                return;
+            }
+
+            if (result.query_type === 'SQL') {
+                html += renderSqlTable(result.data);
+            } else if (result.query_type === 'DOCUMENT') {
+                html += renderDocumentCards(result.data);
+            } else {
+                 html += '<p class="text-red-400">Error: Unknown result type.</p>';
+            }
+            resultsContainer.innerHTML = html;
+        }
+
+        function renderSqlTable(data) {
+            const headers = Object.keys(data[0]);
+            let table = '<table class="w-full text-sm text-left text-slate-400"><thead><tr class="bg-slate-700/50">';
+            headers.forEach(header => {
+                table += `<th scope="col" class="px-4 py-2">${header.toUpperCase()}</th>`;
+            });
+            table += '</tr></thead><tbody>';
+            data.forEach(row => {
+                table += '<tr class="border-b border-slate-700">';
+                headers.forEach(header => {
+                    table += `<td class="px-4 py-2">${row[header]}</td>`;
+                });
+                table += '</tr>';
+            });
+            table += '</tbody></table>';
+            return table;
+        }
+
+        function renderDocumentCards(data) {
+            let cards = '<div class="space-y-4">';
+            data.forEach(item => {
+                // THE FIX IS HERE: Access 'item.chunk' instead of 'item.content'
+                const content = item.chunk || 'No content available';
+                const score = (item.score || 0).toFixed(2);
+                cards += `<div class="bg-slate-700/50 p-3 rounded-md border border-slate-600">
+                              <p class="font-semibold text-blue-400">Relevant Chunk (Score: ${score})</p>
+                              <p class="text-sm text-slate-300 mt-1">${escapeHtml(content)}</p>
+                          </div>`;
+            });
+            cards += '</div>';
+            return cards;
+        }
+
+        // --- Utility Functions ---
+        function setLoading(button, text) {
+            button.disabled = true;
+            button.innerHTML = `<span class="flex items-center justify-center">${text}<svg class="animate-spin -mr-1 ml-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg></span>`;
+        }
+
+        function resetLoading(button, originalText) {
+            button.disabled = false;
+            button.innerHTML = originalText;
+        }
+
+        function escapeHtml(unsafe) {
+            if (typeof unsafe !== 'string') return '';
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
     </script>
 </body>
 </html>
