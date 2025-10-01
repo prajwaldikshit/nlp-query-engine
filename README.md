@@ -113,6 +113,7 @@ You can now interact with the application!
 
 ---
 ## Screenshots:
-<img width="1919" height="867" alt="image" src="https://github.com/user-attachments/assets/4cd9a1ee-e2c6-4efa-92ce-915f7d3d40f8" />
-<img width="1919" height="870" alt="image" src="https://github.com/user-attachments/assets/e61aaea2-9d99-4315-9f21-b3636cd72416" />
+<img width="1919" height="868" alt="image" src="https://github.com/user-attachments/assets/a6a89eb5-2e43-4727-815b-9325b70297e2" />
+<img width="1919" height="865" alt="image" src="https://github.com/user-attachments/assets/98f6f61b-d23b-4913-aa8a-12c02be6e530" />
+
 
